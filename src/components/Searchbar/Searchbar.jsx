@@ -4,8 +4,7 @@ import { Component } from "react";
 export class Searchbar extends Component {
 
   onSubmitHandler = event => {
-    event.preventDefault();
-    console.log(event.target.name.value);
+      event.preventDefault();
   };
   render() {
     return (
