@@ -2,6 +2,7 @@ import { ImageGallery } from 'components/ImageGallery/ImageGallery';
 import { Searchbar } from 'components/Searchbar/Searchbar';
 import { Component } from 'react';
 import { fetchImages } from 'services/api';
+import LoadMoreButton from './components/Button/LoadMoreButton';
 
 export class App extends Component {
   state = {
@@ -59,21 +60,7 @@ export class App extends Component {
       this.setState({ isLoading: false });
     }
   };
-  
 
-  // fetchAllImages = async () => {
-  //   try {
-  //     const images = await fetchImages();
-  //     this.setState({ images: images });
-  //     console.log('images: ', images);
-
-  //   } catch (error) {
-  //     this.setState({error: error.messsage});
-  //   }
-  //   finally{this.setState({isLoading: false})}  };
-  // componentDidMount() {
-  //   this.fetchAllImages();
-  // }
   onHandlerSubmit = query => {
     this.setState(prevState => {
       if (prevState.query === query) {
@@ -85,6 +72,18 @@ export class App extends Component {
         };
     });
   };
+  loadMore = () => {
+    this.setState(
+      prevState => ({ page: prevState.page + 1 }),
+      () => {
+        if (this.state.images.length < this.state.perPage) {
+          this.setState({ showLoadBtn: false });
+          alert("We're sorry, but you've reached the end of search results.");
+        }
+      }
+    );
+  };
+
   showModal = () => {
     this.setState({ showModal: true });
   };
@@ -94,23 +93,12 @@ export class App extends Component {
   };
 
   render() {
-    // const showHits = Array.isArray(this.state.hits) && this.state.hits.length;
     return (
       <>
         <Searchbar onSubmit={this.onHandlerSubmit} />
         <ImageGallery images={this.state.images} onClick={this.showModal} />
-
-        {/* <ul>
-          {showHits &&
-            this.state.hits.map(hit => {
-              return (
-                <li>
-                  <span>id: {hit.id}</span>
-                  <p>tag: {hit.tags}</p>
-                </li>
-              );
-            })}
-        </ul> */}
+        <LoadMoreButton loadMore={ this.loadMore} />
+     
       </>
     );
   }
