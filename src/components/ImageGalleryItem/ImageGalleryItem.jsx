@@ -1,8 +1,12 @@
-import { Component } from 'react';
 
-export const ImageGalleryItem = ({ webformatURL, tags, largeImageURL, onClick }) => {
+export const ImageGalleryItem = ({
+  webformatURL,
+  tags,
+  largeImageURL,
+  onClick,
+}) => {
   return (
-    <li class="gallery-item">
+    <li className="gallery-item">
       <img
         src={webformatURL}
         alt={tags}
@@ -13,4 +17,3 @@ export const ImageGalleryItem = ({ webformatURL, tags, largeImageURL, onClick })
     </li>
   );
 };
-

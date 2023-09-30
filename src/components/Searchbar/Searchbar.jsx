@@ -1,4 +1,5 @@
 import { Component } from 'react';
+import PropTypes from 'prop-types';
 
 export class Searchbar extends Component {
   state = {
@@ -7,21 +8,23 @@ export class Searchbar extends Component {
   onInputClick = event => {
     this.setState({ query: event.currentTarget.value.toLowerCase() });
   };
-  onSubmitHandler = event => {
+  onSubmit = event => {
     event.preventDefault();
     if (this.state.query.trim() === '') {
       alert('Enter your search request, please!');
       return;
     }
-    this.props.onSubmitHandler(this.state.query);
+    this.props.onSubmit(this.state.query);
     this.setState({ query: '' });
   };
   render() {
     return (
       <header className="searchbar">
-        <form onSubmit={this.onSubmitHandler} className="form">
+        <form onSubmit={this.onSubmit} className="form">
           <input
             className="input"
+            name="query"
+            value={this.state.query}
             type="text"
             autoComplete="off"
             autoFocus
@@ -36,3 +39,6 @@ export class Searchbar extends Component {
     );
   }
 }
+Searchbar.propTypees = {
+  onSubmitHandler: PropTypes.func.isRequired, // Ensure it's a function and required
+};
