@@ -1,105 +1,120 @@
-import { ImageGallery } from 'components/ImageGallery/ImageGallery';
-import { Searchbar } from 'components/Searchbar/Searchbar';
 import { Component } from 'react';
 import { fetchImages } from 'services/api';
-import LoadMoreButton from './components/Button/LoadMoreButton';
+import { Searchbar } from 'components/Searchbar/Searchbar';
+import { ImageGallery } from 'components/ImageGallery/ImageGallery';
+import  { Button } from './components/Button/Button';
+import { Loader } from 'components/Loader/Loader';
+import Modal from 'components/Modal/Modal';
+import Notiflix from 'notiflix';
+import css from './App.module.css'
 
 export class App extends Component {
   state = {
-    images: null,
+    images: [],
     query: '',
     page: 1,
-    showModal: 'false',
-    isLoading: 'false',
-    error: null,
-    showLoadBtn: 'false',
-    total: 0,
-    perPage: 12,
-    largeImageURL: '',
-    imageTags: null,
+    isLoading: false,
+    isMore: false,
+    isModal: false,
+    modalImage: {},
+    error: false,
   };
 
-  componentDidUpdate(prevProps, prevState) {
-    const { query, page } = this.state;
-    if ((query && prevState.query !== query) || page > prevState.page) {
-      this.searchImages(query, page);
+  async componentDidUpdate(prevProps, prevState) {
+    const { page, query } = this.state;
+    const perPage = 12;
+    if (this.state.query === '') {
+      return Notiflix.Notify.failure(
+        'Sorry, the field is empty. Please try again.'
+      );
     }
-    if (prevState.query !== query) {
-      this.setState({ images: [] });
+
+    if (prevState.query !== query || prevState.page !== page) {
+      try {
+        this.setState({ isLoading: true });
+
+        const result = await fetchImages(query, page, perPage);
+        const data = result.hits;
+        this.setState(prevState => {
+          return {
+            images: [...prevState.images, ...data],
+            isMore: true,
+          };
+        });
+        if (result.totalHits < perPage * page && page !== 1) {
+          this.setState({ isMore: false });
+          Notiflix.Notify.failure(
+            "We're sorry, but you've reached the end of search results."
+          );
+        }
+        if (data.length < perPage && page === 1) {
+          this.setState({ isMore: false });
+        }
+        if (data.length === 0 && page === 1) {
+          Notiflix.Notify.failure(
+            'Oops! There are no images that match your request!'
+          );
+          this.setState({ isMore: false });
+        }
+        if (page === 1 && data.length !== 0) {
+          Notiflix.Notify.success(
+            `"Hooray! We found ${result.totalHits} images."`
+          );
+        }
+      } catch (error) {
+        this.setState({ error: true });
+        Notiflix.Notify.failure(
+          'Oops! Something went wrong! Try reloading the page!'
+        );
+      } finally {
+        this.setState({ isLoading: false });
+      }
     }
   }
 
-  searchImages = async () => {
-    const { query, page, perPage } = this.state;
-    this.setState({ isLoading: true });
-    try {
-      const data = await fetchImages(query, page, perPage);
-      if (data.hits.length === 0) {
-        this.setState({ showLoadBtn: false });
-        alert('No images found');
-        return;
-      }
-      this.setState(({ images }) => {
-        return {
-          images: [...images, ...data.hits],
-          total: data.totalHits,
-        };
-      });
-      if (data.hits.length > 0 && page === 1) {
-        alert(`We found ${data.totalHits} images`);
-      }
-      if (data.hits.length < perPage) {
-        this.setState({ showLoadBtn: false });
-        alert("We're sorry, but you've reached the end of search results.");
-      } else {
-        this.setState({ showLoadBtn: true });
-      }
-    } catch (error) {
-      this.setState({ error: error });
-    } finally {
-      this.setState({ isLoading: false });
-    }
-  };
-
-  onHandlerSubmit = query => {
-    this.setState(prevState => {
-      if (prevState.query === query) {
-        return;
-      } else
-        return {
-          query,
-          page: 1,
-        };
+  onSubmit = query => {
+    this.setState({
+      query: query,
+      page: 1,
+      images: [],
     });
   };
-  loadMore = () => {
-    this.setState(
-      prevState => ({ page: prevState.page + 1 }),
-      () => {
-        if (this.state.images.length < this.state.perPage) {
-          this.setState({ showLoadBtn: false });
-          alert("We're sorry, but you've reached the end of search results.");
-        }
-      }
-    );
+
+  onLoadMore = () => {
+    this.setState(prevState => {
+      return { page: prevState.page + 1, isMore: false };
+    });
   };
 
-  showModal = () => {
-    this.setState({ showModal: true });
+  showModalImage = image => {
+    this.setState({
+      modalImage: image,
+      isModal: true,
+    });
   };
-
-  closeModal = () => {
-    this.setState({ showModal: false });
+  closeModal = e => {
+    this.setState({
+      modalImage: {},
+      isModal: false,
+    });
   };
 
   render() {
     return (
-      <>
-        <Searchbar onSubmit={this.onHandlerSubmit} />
-        <ImageGallery images={this.state.images} onClick={this.showModal} />
-        <LoadMoreButton loadMore={ this.loadMore} />
-     
-      </>
+      <div className={css.App}>
+        <Searchbar onSubmit={this.onSubmit} />
+        {this.state.images.length !== 0 && (
+          <ImageGallery
+            images={this.state.images}
+            showModalImage={this.showModalImage}
+          />
+        )}
+        {this.state.isLoading && <Loader />}
+        {this.state.isMore && <Button onLoadMore={this.onLoadMore} />}
+        {this.state.isModal && (
+          <Modal largeImage={this.state.modalImage} onClose={this.closeModal} />
+        )}
+      </div>
     );
   }
 }

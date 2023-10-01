@@ -1,18 +1,19 @@
+import css from './ImageGalleryItem.module.css'
 
 export const ImageGalleryItem = ({
-  webformatURL,
-  tags,
-  largeImageURL,
-  onClick,
+  id,
+  webformatImage,
+  largeImage,
+  showModalImage,
+  description,
 }) => {
   return (
-    <li className="gallery-item">
+    <li key={id} className={css.ImageGalleryItem}>
       <img
-        src={webformatURL}
-        alt={tags}
-        onClick={() => {
-          onClick(largeImageURL, tags);
-        }}
+        className={css.ImageGalleryItemImage}
+        src={webformatImage}
+        onClick={() => showModalImage(largeImage)}
+        alt={description}
       />
     </li>
   );

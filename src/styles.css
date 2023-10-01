@@ -1,4 +1,4 @@
-html {
+/* html {
   box-sizing: border-box;
   width: 100vw;
   overflow-x: hidden;
@@ -24,7 +24,7 @@ img {
   display: block;
   max-width: 100%;
   height: auto;
-}
+} */
 
 /*
  * Стили компонента App
@@ -71,12 +71,12 @@ img {
   overflow: hidden;
 }
 
-.SearchForm-button {
+.SearchFormButton {
   display: inline-block;
   width: 48px;
   height: 48px;
   border: 0;
-  background-image: url('https://image.flaticon.com/icons/svg/149/149852.svg');
+  background-image: url(`https://image.flaticon.com/icons/svg/149/149852.svg`);
   background-size: 40%;
   background-repeat: no-repeat;
   background-position: center;
@@ -86,11 +86,11 @@ img {
   outline: none;
 }
 
-.SearchForm-button:hover {
+.SearchFormButton:hover {
   opacity: 1;
 }
 
-.SearchForm-button-label {
+.SearchFormButtonLabel {
   position: absolute;
   width: 1px;
   height: 1px;
@@ -102,7 +102,7 @@ img {
   border: 0;
 }
 
-.SearchForm-input {
+.SearchFormInput {
   display: inline-block;
   width: 100%;
   font: inherit;
@@ -113,7 +113,7 @@ img {
   padding-right: 4px;
 }
 
-.SearchForm-input::placeholder {
+.SearchFormInput::placeholder {
   font: inherit;
   font-size: 18px;
 }
