@@ -11,6 +11,7 @@ export const ImageGallery = ({ images, showModalImage }) => {
           showModalImage={showModalImage}
           largeImage={image.largeImageURL}
           description={image.tags}
+          loading="lazy"
         />
       ))}
     </ul>

@@ -2,11 +2,11 @@ import { Component } from 'react';
 import { fetchImages } from 'services/api';
 import { Searchbar } from 'components/Searchbar/Searchbar';
 import { ImageGallery } from 'components/ImageGallery/ImageGallery';
-import  { Button } from './components/Button/Button';
+import { Button } from './components/Button/Button';
 import { Loader } from 'components/Loader/Loader';
 import Modal from 'components/Modal/Modal';
 import Notiflix from 'notiflix';
-import css from './App.module.css'
+import css from './App.module.css';
 
 export class App extends Component {
   state = {
@@ -14,8 +14,8 @@ export class App extends Component {
     query: '',
     page: 1,
     isLoading: false,
-    isMore: false,
-    isModal: false,
+    isMoreBtn: false,
+    isModalOpen: false,
     modalImage: {},
     error: false,
   };
@@ -38,23 +38,23 @@ export class App extends Component {
         this.setState(prevState => {
           return {
             images: [...prevState.images, ...data],
-            isMore: true,
+            isMoreBtn: true,
           };
         });
         if (result.totalHits < perPage * page && page !== 1) {
-          this.setState({ isMore: false });
+          this.setState({ isMoreBtn: false });
           Notiflix.Notify.failure(
             "We're sorry, but you've reached the end of search results."
           );
         }
         if (data.length < perPage && page === 1) {
-          this.setState({ isMore: false });
+          this.setState({ isMoreBtn: false });
         }
         if (data.length === 0 && page === 1) {
           Notiflix.Notify.failure(
             'Oops! There are no images that match your request!'
           );
-          this.setState({ isMore: false });
+          this.setState({ isMoreBtn: false });
         }
         if (page === 1 && data.length !== 0) {
           Notiflix.Notify.success(
@@ -82,20 +82,22 @@ export class App extends Component {
 
   onLoadMore = () => {
     this.setState(prevState => {
-      return { page: prevState.page + 1, isMore: false };
+      return { page: prevState.page + 1, isMoreBtn: false };
     });
   };
 
   showModalImage = image => {
     this.setState({
       modalImage: image,
-      isModal: true,
+      isModalOpen: true,
+      isLoading: true,
     });
   };
   closeModal = e => {
     this.setState({
       modalImage: {},
-      isModal: false,
+      isModalOpen: false,
+      isLoading: false,
     });
   };
 
@@ -110,8 +112,8 @@ export class App extends Component {
           />
         )}
         {this.state.isLoading && <Loader />}
-        {this.state.isMore && <Button onLoadMore={this.onLoadMore} />}
-        {this.state.isModal && (
+        {this.state.isMoreBtn && <Button onLoadMore={this.onLoadMore} />}
+        {this.state.isModalOpen && (
           <Modal largeImage={this.state.modalImage} onClose={this.closeModal} />
         )}
       </div>
