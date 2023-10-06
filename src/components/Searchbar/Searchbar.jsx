@@ -1,44 +1,40 @@
-import { Component } from 'react';
-import css from './SearchBar.module.css'
+import { useState } from 'react';
+import css from './SearchBar.module.css';
+import Notiflix from 'notiflix';
 
-export class Searchbar extends Component {
-  state = {
-    query: '',
+export const Searchbar = ({ onSubmit }) => {
+  const [query, setQuery] = useState('');
+
+  const onInputClick = event => {
+    setQuery(event.currentTarget.value.toLowerCase());
   };
-  onInputClick = event => {
-    this.setState({ query: event.currentTarget.value.toLowerCase() });
-  };
-  onSubmit = event => {
+  const handleSubmit = event => {
     event.preventDefault();
-    if (this.state.query.trim() === '') {
-      alert('Enter your search request, please!');
+    if (query.trim() === '') {
+      Notiflix.Notify.info('Enter your search request, please!');
       return;
     }
-    this.props.onSubmit(this.state.query);
-    this.setState({ query: '' });
+    onSubmit(query);
+    setQuery('');
   };
-  render() {
-    return (
-      <header className={css.Searchbar}>
-        <form onSubmit={this.onSubmit} className={css.SearchForm}>
-          <button type="submit" className={css.SearchFormButton}>
-            <span className={css.SearchFormButtonLabel}>Search</span>
-          </button>
-          <input
-            className={css.SearchFormInput}
-            name="query"
-            value={this.state.query}
-            type="text"
-            autoComplete="off"
-            autoFocus
-            placeholder="Search images and photos"
-            onChange={this.onInputClick}
-          />
-        </form>
-      </header>
-    );
-  }
-}
-// Searchbar.propTypees = {
-//   onSubmitHandler: PropTypes.func.isRequired, // Ensure it's a function and required
-// };
+
+  return (
+    <header className={css.Searchbar}>
+      <form onSubmit={handleSubmit} className={css.SearchForm}>
+        <button type="submit" className={css.SearchFormButton}>
+          <span className={css.SearchFormButtonLabel}>Search</span>
+        </button>
+        <input
+          className={css.SearchFormInput}
+          name="query"
+          value={query}
+          type="text"
+          autoComplete="off"
+          autoFocus
+          placeholder="Search images and photos"
+          onChange={onInputClick}
+        />
+      </form>
+    </header>
+  );
+};
